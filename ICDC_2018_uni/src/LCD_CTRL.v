@@ -73,124 +73,129 @@ always @(*) begin
 end
 
 always @(*) begin
-    temp_idx1 = ((y_point - 1'd1) << 3) + (x_point - 1'd1); //(0,0)
-    temp_idx2 = ((y_point - 1'd1) << 3) + x_point; //(0,1)
-    temp_idx3 = (y_point << 3) + (x_point - 1'd1); //(1,0)
+    temp_idx1 = ((y_point - 1) << 3) + (x_point - 1); //(0,0)
+    temp_idx2 = ((y_point - 1) << 3) + x_point; //(0,1)
+    temp_idx3 = (y_point << 3) + (x_point - 1); //(1,0)
     temp_idx4 = (y_point << 3) + x_point; //(1,1)
+end
+
+always @(*) begin
+    temp_max = 8'd0;
+    temp_min = 8'd255;
+    temp_avg = 8'd0;
+    
     case(cmd)
-        Max:
+        Max: begin
             temp_max = image[temp_idx1];
-            if (image[temp_idx2] > temp_max) begin
-                temp_max = image[temp_idx2];
-            end
-            if (image[temp_idx3] > temp_max) begin
-                temp_max = image[temp_idx3];
-            end
-            if (image[temp_idx4] > temp_max) begin
-                temp_max = image[temp_idx4];
-            end
-        Min:
+            if (image[temp_idx2] > temp_max) temp_max = image[temp_idx2];
+            if (image[temp_idx3] > temp_max) temp_max = image[temp_idx3];
+            if (image[temp_idx4] > temp_max) temp_max = image[temp_idx4];
+        end
+        Min: begin
             temp_min = image[temp_idx1];
-            if (image[temp_idx2] < temp_min) begin
-                temp_min = image[temp_idx2];
-            end
-            if (image[temp_idx3] < temp_min) begin
-                temp_min = image[temp_idx3];
-            end
-            if (image[temp_idx4] < temp_min) begin
-                temp_min = image[temp_idx4];
-            end
+            if (image[temp_idx2] < temp_min) temp_min = image[temp_idx2];
+            if (image[temp_idx3] < temp_min) temp_min = image[temp_idx3];
+            if (image[temp_idx4] < temp_min) temp_min = image[temp_idx4];
+        end
         Avg:
             temp_avg = (image[temp_idx1] + image[temp_idx2] + image[temp_idx3] + image[temp_idx4]) >> 2;
-        default:
-            temp_max = 8'd0;
-            temp_min = 8'd255;
-            temp_avg = 8'd0;
     endcase
 end
 always @(posedge clk or posedge reset) begin
     if (reset) begin
-        read_cnt <= 6'd0;
-        write_cnt <= 6'd0;
-        IROM_rd <= 1'b1;
-        IROM_A <= 6'd0;
-        busy <= 1'b1;
-        IRAM_valid <= 1'b0;
-        done <= 1'b0;
-        x_point <= 3'd4;
-        y_point <= 3'd4;
+        read_cnt <= 0;
+        write_cnt <= 0;
+        IROM_rd <= 1;
+        IROM_A <= 0;
+        busy <= 1;
+        IRAM_valid <= 0;
+        done <= 0;
+        x_point <= 4;
+        y_point <= 4;
     end else begin
         case(state)
-            INIT:
-                read_cnt <= 6'd0;
-                IROM_rd <= 1'b1;
-                IROM_A <= 6'd0;
-                busy <= 1'b1;
-            READ:
+            INIT: begin
+                read_cnt <= 0;
+                IROM_rd <= 1;
+                IROM_A <= 0;
+                busy <= 1;
+            end
+            READ: begin
                 image[read_cnt] <= IROM_Q;
                 if (read_cnt < 6'd63) begin
-                    read_cnt <= read_cnt + 1'b1;
-                    IROM_A <= read_cnt + 1'b1;
+                    read_cnt <= read_cnt + 1;
+                    IROM_A <= read_cnt + 1;
                 end else begin
-                    IROM_rd <= 1'b0;
-                    busy <= 1'b0;
+                    IROM_rd <= 0;
+                    busy <= 0;
                 end
-            IDLE:
+            end
+            IDLE: begin
+                if (cmd_valid) begin
+                    busy <= 1;
+                end
+            end
+            PROCESS: begin
                 if (cmd_valid) begin
                     busy <= 1'b1;
                 end
-            PROCESS:
-                if (cmd_valid) begin
-                    busy <= 1'b1;
-                end
-                case(cmd)
-                    Shift_Up:
+                case(cmd)  // 移除錯誤的begin
+                    Shift_Up: begin
                         if (y_point > 3'd1) begin
                             y_point <= y_point - 1'b1;
                         end
-                    Shift_Down:
+                    end
+                    Shift_Down: begin
                         if (y_point < 3'd7) begin
                             y_point <= y_point + 1'b1;
                         end
-                    Shift_Left:
+                    end
+                    Shift_Left: begin
                         if (x_point > 3'd1) begin
                             x_point <= x_point - 1'b1;
                         end
-                    Shift_Right:
+                    end
+                    Shift_Right: begin
                         if (x_point < 3'd7) begin
                             x_point <= x_point + 1'b1;
                         end
-                    Max:
+                    end
+                    Max: begin
                         // y_point*8 + x_point is address
                         image[temp_idx1] <= temp_max;
                         image[temp_idx2] <= temp_max;
                         image[temp_idx3] <= temp_max;
                         image[temp_idx4] <= temp_max;
-                    Min:
+                    end
+                    Min: begin
                         image[temp_idx1] <= temp_min;
                         image[temp_idx2] <= temp_min;
                         image[temp_idx3] <= temp_min;
                         image[temp_idx4] <= temp_min;
-                    Avg:
+                    end
+                    Avg: begin
                         image[temp_idx1] <= temp_avg;
                         image[temp_idx2] <= temp_avg;
                         image[temp_idx3] <= temp_avg;
                         image[temp_idx4] <= temp_avg;
-                    Counterclockwise:
+                    end
+                    Counterclockwise: begin
                         // 0,0 -> 0,1 -> 1,1 -> 1,0 -> 0,0
                         temp <= image[temp_idx1];
                         image[temp_idx1] <= image[temp_idx2];
                         image[temp_idx2] <= image[temp_idx4];
                         image[temp_idx4] <= image[temp_idx3];
                         image[temp_idx3] <= temp;
-                    Clockwise:
+                    end
+                    Clockwise: begin
                         // 0,0 -> 1,0 -> 1,1 -> 0,1 -> 0,0
                         temp <= image[temp_idx1];
                         image[temp_idx1] <= image[temp_idx3];
                         image[temp_idx3] <= image[temp_idx4];
                         image[temp_idx4] <= image[temp_idx2];
                         image[temp_idx2] <= temp;
-                    Mirror_X:
+                    end
+                    Mirror_X: begin
                         // 0,0 , 1,0 <-> 0,1 , 1,1
                         temp <= image[temp_idx1];
                         image[temp_idx1] <= image[temp_idx3];
@@ -198,7 +203,8 @@ always @(posedge clk or posedge reset) begin
                         temp1 <= image[temp_idx2];
                         image[temp_idx2] <= image[temp_idx4];
                         image[temp_idx4] <= temp1;
-                    Mirror_Y:
+                    end
+                    Mirror_Y: begin
                         // 0,0 , 1,0 <-> 0,1 , 1,1
                         temp <= image[temp_idx1];
                         image[temp_idx1] <= image[temp_idx2];
@@ -206,26 +212,30 @@ always @(posedge clk or posedge reset) begin
                         temp1 <= image[temp_idx3];
                         image[temp_idx3] <= image[temp_idx4];
                         image[temp_idx4] <= temp1;
+                    end
                 endcase
                 busy <= 1'b0;
-            WRITE:
-                IRAM_valid <= 1'b1;
+            end
+            WRITE: begin
+                IRAM_valid <= 1;
                 IRAM_A <= write_cnt;
                 IRAM_D <= image[write_cnt];
                 if (write_cnt < 6'd63) begin
-                    write_cnt <= write_cnt + 1'b1;
+                    write_cnt <= write_cnt + 1;
                 end else begin
-                    IRAM_valid <= 1'b0;
-                    busy <= 1'b0;
-                    done <= 1'b1;
-                    write_cnt <= 6'd0;
+                    IRAM_valid <= 0;
+                    busy <= 0;
+                    done <= 1;
+                    write_cnt <= 0;
                 end
-            default:
-                read_cnt <= 6'd0;
-                IROM_rd <= 1'b1;
-                IROM_A <= 6'd0;
-                busy <= 1'b0;
-                done <= 1'b1;
+            end
+            default: begin
+                read_cnt <= 0;
+                IROM_rd <= 1;
+                IROM_A <= 0;
+                busy <= 0;
+                done <= 1;
+            end
         endcase
     end
 end
