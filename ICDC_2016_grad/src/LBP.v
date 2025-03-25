@@ -76,7 +76,7 @@ always @(posedge clk or posedge reset) begin
         read_count <= 4'd0;
         lbp_result <= 8'd0;
         
-        // 初始化所有像素缓冲区为0
+
         pixel_buffer[0] <= 8'd0;
         pixel_buffer[1] <= 8'd0;
         pixel_buffer[2] <= 8'd0;

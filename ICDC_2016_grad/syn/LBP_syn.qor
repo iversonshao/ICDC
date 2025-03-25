@@ -3,7 +3,7 @@
 Report : qor
 Design : LBP
 Version: W-2024.09-SP2
-Date   : Sun Mar 23 00:29:21 2025
+Date   : Tue Mar 25 12:18:27 2025
 ****************************************
 
 
@@ -67,8 +67,8 @@ Date   : Sun Mar 23 00:29:21 2025
   Logic Optimization:                  0.01
   Mapping Optimization:                0.28
   -----------------------------------------
-  Overall Compile Time:                1.04
-  Overall Compile Wall Clock Time:     1.06
+  Overall Compile Time:                1.02
+  Overall Compile Wall Clock Time:     1.04
 
   --------------------------------------------------------------------
 
