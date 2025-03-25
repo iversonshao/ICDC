@@ -1,4 +1,3 @@
-
 `timescale 1ns/10ps
 module LBP ( clk, reset, gray_addr, gray_req, gray_ready, gray_data, lbp_addr, lbp_valid, lbp_data, finish);
 input clk;
@@ -75,6 +74,18 @@ always @(posedge clk or posedge reset) begin
         row <= 7'd1;
         col <= 7'd1;
         read_count <= 4'd0;
+        lbp_result <= 8'd0;
+        
+        // 初始化所有像素缓冲区为0
+        pixel_buffer[0] <= 8'd0;
+        pixel_buffer[1] <= 8'd0;
+        pixel_buffer[2] <= 8'd0;
+        pixel_buffer[3] <= 8'd0;
+        pixel_buffer[4] <= 8'd0;
+        pixel_buffer[5] <= 8'd0;
+        pixel_buffer[6] <= 8'd0;
+        pixel_buffer[7] <= 8'd0;
+        pixel_buffer[8] <= 8'd0;
     end else begin
         case(state)
             IDLE: begin
@@ -115,6 +126,16 @@ always @(posedge clk or posedge reset) begin
                 pixel_buffer[8] <= gray_data;
                 lbp_valid <= 1'b0;
                 gray_req <= 1'b0;
+                
+
+                lbp_result <= ((pixel_buffer[0] >= pixel_buffer[4]) ? 8'h01 : 8'h00) |
+                            ((pixel_buffer[1] >= pixel_buffer[4]) ? 8'h02 : 8'h00) |
+                            ((pixel_buffer[2] >= pixel_buffer[4]) ? 8'h04 : 8'h00) |
+                            ((pixel_buffer[3] >= pixel_buffer[4]) ? 8'h08 : 8'h00) |
+                            ((pixel_buffer[5] >= pixel_buffer[4]) ? 8'h10 : 8'h00) |
+                            ((pixel_buffer[6] >= pixel_buffer[4]) ? 8'h20 : 8'h00) |
+                            ((pixel_buffer[7] >= pixel_buffer[4]) ? 8'h40 : 8'h00) |
+                            ((gray_data >= pixel_buffer[4]) ? 8'h80 : 8'h00);
             end
             WRITE: begin
                 lbp_valid <= 1'b1;
@@ -146,30 +167,6 @@ always @(posedge clk or posedge reset) begin
                 finish <= 1'b0;
             end
         endcase
-    end
-end
-
-
-always @(posedge clk or posedge reset) begin
-    if (reset) begin
-        lbp_result <= 8'd0;
-        for (integer i = 0; i < 9; i = i + 1) begin
-            pixel_buffer[i] <= 8'd0;
-        end
-    end else begin 
-        if (state == COMPUTE) begin
-            pixel_buffer[8] <= gray_data;
-            lbp_result <= ((pixel_buffer[0] >= pixel_buffer[4]) ? 8'h01 : 8'h00) |
-                        ((pixel_buffer[1] >= pixel_buffer[4]) ? 8'h02 : 8'h00) |
-                        ((pixel_buffer[2] >= pixel_buffer[4]) ? 8'h04 : 8'h00) |
-                        ((pixel_buffer[3] >= pixel_buffer[4]) ? 8'h08 : 8'h00) |
-                        ((pixel_buffer[5] >= pixel_buffer[4]) ? 8'h10 : 8'h00) |
-                        ((pixel_buffer[6] >= pixel_buffer[4]) ? 8'h20 : 8'h00) |
-                        ((pixel_buffer[7] >= pixel_buffer[4]) ? 8'h40 : 8'h00) |
-                        ((gray_data >= pixel_buffer[4]) ? 8'h80 : 8'h00);
-        end else begin
-            lbp_result <= 8'd0;
-        end
     end
 end
 //====================================================================
