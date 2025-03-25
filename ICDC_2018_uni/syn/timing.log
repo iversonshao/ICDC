@@ -1,0 +1,80 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : LCD_CTRL
+Version: W-2024.09-SP2
+Date   : Sun Mar 16 01:28:48 2025
+****************************************
+
+Operating Conditions: slow   Library: slow
+Wire Load Model Mode: top
+
+  Startpoint: x_point_reg[2]
+              (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: image_reg[57][5]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  LCD_CTRL           tsmc13_wl10           slow
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.50       0.50
+  x_point_reg[2]/CK (DFFSX4)                              0.00       0.50 r
+  x_point_reg[2]/Q (DFFSX4)                               0.42       0.92 f
+  U3470/Y (BUFX20)                                        0.14       1.06 f
+  U6131/Y (CLKINVX1)                                      0.42       1.47 r
+  U3950/Y (NOR2X1)                                        0.42       1.90 f
+  U4160/Y (AND2X2)                                        0.61       2.51 f
+  U5727/Y (CLKBUFX3)                                      0.96       3.47 f
+  U4062/Y (AOI221XL)                                      0.80       4.26 r
+  U8754/Y (NAND4X1)                                       0.34       4.60 f
+  U4646/Y (AOI22X2)                                       0.26       4.86 r
+  U4473/Y (OAI221X4)                                      0.39       5.24 f
+  add_1_root_add_0_root_add_111_3/A[0] (LCD_CTRL_DW01_add_6)
+                                                          0.00       5.24 f
+  add_1_root_add_0_root_add_111_3/U1/Y (AND2X2)           0.23       5.47 f
+  add_1_root_add_0_root_add_111_3/U1_1/CO (ADDFX2)        0.35       5.82 f
+  add_1_root_add_0_root_add_111_3/U1_2/CO (CMPR32X2)      0.37       6.19 f
+  add_1_root_add_0_root_add_111_3/U1_3/CO (ADDFX1)        0.35       6.54 f
+  add_1_root_add_0_root_add_111_3/U1_4/CO (ADDFXL)        0.51       7.05 f
+  add_1_root_add_0_root_add_111_3/U1_5/CO (ADDFHX2)       0.28       7.33 f
+  add_1_root_add_0_root_add_111_3/U1_6/S (ADDFXL)         0.72       8.05 r
+  add_1_root_add_0_root_add_111_3/SUM[6] (LCD_CTRL_DW01_add_6)
+                                                          0.00       8.05 r
+  add_0_root_add_0_root_add_111_3/B[6] (LCD_CTRL_DW01_add_4)
+                                                          0.00       8.05 r
+  add_0_root_add_0_root_add_111_3/U1_6/CO (ADDFHX2)       0.37       8.42 r
+  add_0_root_add_0_root_add_111_3/U1_7/Y (XOR3X2)         0.24       8.66 f
+  add_0_root_add_0_root_add_111_3/SUM[7] (LCD_CTRL_DW01_add_4)
+                                                          0.00       8.66 f
+  U9278/Y (AO22X4)                                        0.25       8.91 f
+  U9279/Y (OAI32X2)                                       0.31       9.22 r
+  U4543/Y (BUFX12)                                        0.23       9.45 r
+  U4542/Y (INVX16)                                        0.13       9.58 f
+  U6620/Y (CLKMX2X2)                                      0.22       9.81 f
+  U6618/Y (AO21X1)                                        0.31      10.12 f
+  image_reg[57][5]/D (DFFQX1)                             0.00      10.12 f
+  data arrival time                                                 10.12
+
+  clock clk (rise edge)                                  10.00      10.00
+  clock network delay (ideal)                             0.50      10.50
+  clock uncertainty                                      -0.10      10.40
+  image_reg[57][5]/CK (DFFQX1)                            0.00      10.40 r
+  library setup time                                     -0.27      10.13
+  data required time                                                10.13
+  --------------------------------------------------------------------------
+  data required time                                                10.13
+  data arrival time                                                -10.12
+  --------------------------------------------------------------------------
+  slack (MET)                                                        0.01
+
+
+1

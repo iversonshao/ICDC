@@ -2,24 +2,24 @@
 `define CYCLE    10.0         	        // Modify your clock period here
 
 
-`define SDFFILE  "./LCD_CTRL_syn.sdf"	// Modify your sdf file name
+`define SDFFILE  "syn/LCD_CTRL_syn.sdf"	// Modify your sdf file name
 
 `ifdef tb1
-  `define EXPECT "./tb1_goal.dat"
-  `define CMD "./cmd1.dat"
-  `define IMAGE "image1.dat"
+  `define EXPECT "test/tb1_goal.dat"
+  `define CMD "test/cmd1.dat"
+  `define IMAGE "test/image1.dat"
 `endif
 
 `ifdef tb2
-  `define EXPECT "./tb2_goal.dat"
-  `define CMD "./cmd2.dat"
-  `define IMAGE "image2.dat"
+  `define EXPECT ".test/tb2_goal.dat"
+  `define CMD ".test/cmd2.dat"
+  `define IMAGE "test/image2.dat"
 `endif
 
 `ifdef tb3
-  `define EXPECT "./tb3_goal.dat"
-  `define CMD "./cmd3.dat"
-  `define IMAGE "image3.dat"
+  `define EXPECT ".test/tb3_goal.dat"
+  `define CMD ".test/cmd3.dat"
+  `define IMAGE "test/image3.dat"
 `endif
 
 

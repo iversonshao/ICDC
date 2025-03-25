@@ -1,1 +1,0 @@
-read_file -format verilog src/LCD_CTRL.v
